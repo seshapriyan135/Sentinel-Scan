@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentinelScan</title>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif, monospace;
+            background-color: rgb(255, 255, 255);
+            color: rgb(214, 26, 26);
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-top: 300px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px auto;
+            width: 300px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        a {
+            display: block;
+            padding: 10px;
+            background-color: #db3232;
+            color: rgb(255, 255, 255);
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        a:hover {
+            background-color: #ff9100;
+        }
+    </style>
+</head>
+<body>
+    <h1>SentinelScan: Advanced Network Scanner and Packet Detection Suite </h1>
+    <ul>
+        <li><a href="{{ url_for('port_scanner') }}" target="_blank">Network Port Scanner</a></li>
+        <li><a href="{{ url_for('packet_sniffer') }}" target="_blank">Packet Detection</a></li>
+    </ul>
+</body>
+</html>

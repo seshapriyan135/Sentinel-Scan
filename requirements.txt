@@ -1,0 +1,5 @@
+pip install flask
+pip install flask_socketio
+pip install sockets
+pip install os-sys
+pip install eventlet

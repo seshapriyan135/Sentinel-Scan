@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Packet Detection</title>
+    <style>
+         body {
+            background-color:rgb(255, 255, 255);
+            color: #000000;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #db3232;
+        }
+        @keyframes blink-animation {
+        0% {
+            opacity: 1; /* Fully visible */
+        }
+        50% {
+            opacity: 0.8; /* Invisible */
+        }
+        100% {
+            opacity: 1; /* Fully visible */
+        }}
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #db3232;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #db3232;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+            overflow: hidden; /* Hide overflow content */
+            white-space: nowrap; /* Prevent wrapping */
+            text-overflow: ellipsis;
+        }
+
+        th {
+            background-color: #db3232;
+            color: white;
+        }
+
+        /* Add some responsive design */
+        @media only screen and (max-width: 600px) {
+            input, button {
+                width: 100%;
+            }
+        }
+        img{
+            border: 2px solid black; /* Green border */
+        border-radius: 50%; /* Rounded border */
+       /* Set the width of the box */
+        text-align: center;
+        position: absolute; 
+        top: 2%;
+        right: 2%;
+        animation: blink-animation 1s infinite; 
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Packet Detection  </h1>
+     <hr>
+    <p id="ipv4Address"></p>
+
+    <script>
+        // Function to get the IPv4 address
+        function getIPv4Address() {
+            // Create a temporary RTCPeerConnection to get local IP addresses
+            var pc = new RTCPeerConnection();
+            console.log(pc);
+            // Set up an event listener for the icecandidate event
+            pc.onicecandidate = function (event) {
+                if (event.candidate) {
+                    var ipAddress = event.candidate.address;
+                    console.log(ipAddress);
+                    // Check if the IP address is IPv4
+                    if (isIPv4(ipAddress)) {
+                        // Display the IPv4 address in a paragraph element
+                        document.getElementById('ipv4Address').innerText = "IPv4 Address: " + ipAddress;
+                    }
+                }
+            };
+
+            // Create an SDP offer
+            pc.createOffer().then(function (offer) {
+                // Set the local description
+                return pc.setLocalDescription(offer);
+            }).catch(function (error) {
+                console.error(error);
+            });
+        }
+
+        // Function to check if an address is IPv4
+        function isIPv4(address) {
+            // Regular expression to match IPv4 addresses
+            console.log(address);
+            var ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/;
+            return ipv4Regex.test(address);
+        }
+
+        // Call the function when the page loads
+        window.onload = getIPv4Address;
+    </script>
+    <label for="ipAddress">Enter IP Address:</label>
+    <br>
+    <input type="text" id="ipAddress" name="ipAddress" placeholder="e.g., 192.168.29.142">
+    <br><br>
+    <!-- Add this button to your HTML file -->
+<button id="executeButton">Start capturing</button>
+<button id="stopButton">Stop capturing</button>
+
+    <h1>Packet Details</h1>
+    <table id="packetTable">
+        <tr>
+            <th>Source IP</th>
+            <th>Destination IP</th>
+            <th>Packet Data</th>
+            <th>Packet Information</th>
+            <th>Status</th>
+        </tr>
+    </table>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+<script>
+    const socket = io.connect('http://127.0.0.1:5001');
+
+    // Function to handle button click
+    function executePythonCode() {
+        // Send a request to the Flask server
+        var ipAddress = document.getElementById('ipAddress').value;
+        socket.emit('execute_code',{ ipAddress: ipAddress });
+    }
+    // Function to handle button click
+    function stopPythonCode() {
+        // Send a request to the Flask server
+        console.log('stop');
+        socket.emit('stop_code');
+    }
+    // Attach the function to the button click event
+    document.getElementById('executeButton').addEventListener('click', executePythonCode);
+    document.getElementById('stopButton').addEventListener('click', stopPythonCode);
+
+    socket.on('packet', function(data) {
+        // Update your UI with the new packet data
+        // console.log(data);
+        var tr = document.createElement("tr");
+        var td1 = document.createElement("td");
+        var td2 = document.createElement("td");
+        var td3 = document.createElement("td");
+        var td4 = document.createElement("td");
+        var td5 = document.createElement("td");
+
+        td1.textContent = data.src_ip;
+        td2.textContent = data.dst_ip;
+        td2.title = data.dst_ip;
+        td3.textContent = data.payload_data.length > 100 ? data.payload_data.substring(0, 100) + '...' : data.payload_data;
+        td3.title = data.payload_data;
+        td4.textContent = data.packet_info.length > 100 ? data.packet_info.substring(0, 100) + '...' : data.packet_info;
+        td4.title = data.packet_info;
+        td5.textContent = data.security_status;
+
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        tr.appendChild(td4);
+        tr.appendChild(td5);
+
+        document.getElementById("packetTable").appendChild(tr);
+    });
+</script>
+</body>
+</html>

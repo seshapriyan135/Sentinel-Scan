@@ -1,0 +1,6 @@
+Requirements for packet capturing:
+
+1.Flask:pip install Flask
+2.Flask-SocketIO:pip install flask-socketio
+3.scapy:pip install scapy
+4.Socket.IO JavaScript client:<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
